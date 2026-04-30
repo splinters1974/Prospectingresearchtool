@@ -71,9 +71,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(report);
   } catch (err) {
-    console.error('Synthesis error:', err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error('Synthesis error:', message);
     return NextResponse.json(
-      { error: 'Failed to generate report. Please try again.' },
+      { error: `Failed to generate report: ${message}` },
       { status: 500 }
     );
   }

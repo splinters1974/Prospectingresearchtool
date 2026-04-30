@@ -6,7 +6,7 @@ interface TavilyResult {
   content: string;
 }
 
-async function tavilySearch(query: string, depth: 'basic' | 'advanced' = 'basic'): Promise<string> {
+async function tavilySearch(query: string): Promise<string> {
   const apiKey = process.env.TAVILY_API_KEY;
   if (!apiKey) return '';
   try {
@@ -16,11 +16,10 @@ async function tavilySearch(query: string, depth: 'basic' | 'advanced' = 'basic'
       body: JSON.stringify({
         api_key: apiKey,
         query,
-        search_depth: depth,
+        search_depth: 'basic',
         max_results: 5,
-        include_domains: [],
-        exclude_domains: [],
       }),
+      signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) return '';
     const data = await res.json();
@@ -33,48 +32,39 @@ async function tavilySearch(query: string, depth: 'basic' | 'advanced' = 'basic'
   }
 }
 
+// Run queries sequentially in batches to avoid overwhelming Tavily
+async function batchSearch(queries: string[]): Promise<string> {
+  const results: string[] = [];
+  for (const q of queries) {
+    const r = await tavilySearch(q);
+    if (r) results.push(r);
+  }
+  return results.join('\n\n---\n\n');
+}
+
 export async function searchCompanyEnergy(companyName: string): Promise<string> {
   const queries = [
-    `"${companyName}" net zero carbon target UK`,
-    `"${companyName}" energy projects renewable sustainability UK`,
-    `"${companyName}" ESOS SECR carbon reporting Scope emissions`,
-    `"${companyName}" annual report energy carbon strategy`,
-    `"${companyName}" sustainability report climate change energy`,
-    `"${companyName}" energy efficiency decarbonisation heat pump solar PPA`,
+    `"${companyName}" net zero carbon target sustainability UK`,
+    `"${companyName}" ESOS SECR energy carbon annual report`,
+    `"${companyName}" energy projects renewable decarbonisation`,
   ];
-
-  const results = await Promise.all(queries.map((q) => tavilySearch(q)));
-  return results.filter(Boolean).join('\n\n---\n\n');
+  return batchSearch(queries);
 }
 
 export async function searchCompanyPeople(companyName: string): Promise<string> {
   const queries = [
-    // UK senior leadership
-    `"${companyName}" UK "managing director" OR "MD" OR "chief executive" OR "CEO"`,
-    `"${companyName}" UK "operations director" OR "finance director" OR "chief financial officer"`,
-    `"${companyName}" UK "engineering director" OR "technical director" OR "chief technical officer"`,
-    // Energy & sustainability
-    `"${companyName}" "head of sustainability" OR "sustainability director" OR "energy manager" OR "carbon manager"`,
-    `"${companyName}" "head of energy" OR "energy director" OR "environment manager" OR "ESG"`,
-    // Procurement
-    `"${companyName}" "procurement director" OR "head of procurement" OR "category manager" energy sustainability`,
-    // International / overseas stakeholders
-    `"${companyName}" UK "country manager" OR "UK director" OR "VP UK" OR "general manager UK"`,
-    `"${companyName}" global "chief sustainability officer" OR "group energy" OR "group sustainability"`,
+    `"${companyName}" UK managing director CEO CFO operations finance director`,
+    `"${companyName}" sustainability director energy manager ESG procurement`,
+    `"${companyName}" UK leadership team engineering director country manager`,
+    `"${companyName}" global chief sustainability officer group energy director`,
   ];
-
-  const results = await Promise.all(queries.map((q) => tavilySearch(q)));
-  return results.filter(Boolean).join('\n\n---\n\n');
+  return batchSearch(queries);
 }
 
 export async function searchCompanyNews(companyName: string): Promise<string> {
   const queries = [
-    `"${companyName}" energy news 2024 2025`,
-    `"${companyName}" sustainability success renewable achievement award`,
-    `"${companyName}" carbon reduction net zero announcement press release`,
-    `"${companyName}" energy project case study investment`,
+    `"${companyName}" energy sustainability news 2024 2025`,
+    `"${companyName}" carbon net zero achievement press release announcement`,
   ];
-
-  const results = await Promise.all(queries.map((q) => tavilySearch(q, 'advanced')));
-  return results.filter(Boolean).join('\n\n---\n\n');
+  return batchSearch(queries);
 }
