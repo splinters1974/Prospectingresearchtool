@@ -39,8 +39,22 @@ Prioritise finding ALL of the following roles where they exist:
 1. Board/Directors: CEO, MD, CFO, Chairman (from Companies House + search)
 2. Senior UK Leadership: UK Managing Director, UK Operations Director, UK Finance Director, UK Engineering/Technical Director
 3. Energy & Sustainability: Head of Sustainability, Sustainability Director, Energy Manager, Carbon Manager, ESG Director, Environment Manager, Head of Net Zero, Facilities Director (if energy responsible)
-4. Procurement: Procurement Director, Head of Procurement, Category Manager (Energy or Sustainability), Supply Chain Director
-5. Global stakeholders (for international cos): Chief Sustainability Officer (Group), Group Energy Director, VP Sustainability
+4. Procurement / Energy Buying: Category Manager (Energy or Utilities), Energy Buyer, Group Energy Manager, Head of Procurement (if energy in remit), Supply Chain Director, Head of Estates, Utilities Manager, Head of Facilities
+5. Global stakeholders (for international cos): Chief Sustainability Officer (Group), Group Energy Director, VP Sustainability, European Energy Manager
+
+BUYER TYPE — for each person, set buyerType:
+- "supply": their role involves procuring energy commodity (gas/power contracts, TPI/broker relationships, half-hourly metering, supplier selection, contract renewals). Typical roles: Energy Buyer, Category Manager Energy/Utilities, Group Energy Manager, Procurement Director
+- "solutions": their role involves approving energy projects, efficiency measures, renewables, EV fleet, ESOS/SECR compliance, decarbonisation capex. Typical roles: Sustainability Director, Energy Manager, Head of Net Zero, Engineering Director, Capital Projects Manager
+- "both": their role spans both (e.g. Head of Facilities who manages both contracts and projects, CFO who approves all energy spend)
+- Omit buyerType for board/general leadership with no direct energy remit
+
+ENERGY DECISION STRUCTURE:
+For ALL companies (especially multi-site or international), write a 2-3 sentence energyDecisionStructure field that explains:
+- Who makes the day-to-day energy supply decisions (contract renewals, supplier selection) — is it UK-led or centralised at group/regional HQ?
+- Who approves energy projects and capital spend (net zero initiatives, efficiency projects, onsite generation)?
+- For international companies: where are major decisions made (e.g. European HQ in Germany, US parent)?
+- What the likely approval threshold is for multi-year deals or significant energy contracts
+Example: "Energy supply contracts for UK sites are managed locally by the UK Facilities Director, with procurement sign-off required above £100k. Major capital projects and net zero strategy are set at Group level by the Global Head of Sustainability in Amsterdam. Multi-year PPAs would require Group CFO approval."
 
 ANNUAL REPORTS & ACCOUNTS:
 - Companies House filing history shows when accounts were filed and the period covered
@@ -115,7 +129,8 @@ Return a JSON object matching this exact TypeScript interface:
     {
       name: string,
       jobTitle: string,
-      category: "board" | "senior_leadership" | "energy_sustainability",
+      category: "board" | "senior_leadership" | "energy_sustainability" | "procurement",
+      buyerType?: "supply" | "solutions" | "both",  // see instructions above
       isUKBased?: boolean,             // false for overseas stakeholders at international companies
       location?: string,               // e.g. "UK", "USA (Global HQ)", "Germany"
       bio: string,
@@ -127,6 +142,7 @@ Return a JSON object matching this exact TypeScript interface:
       }
     }
   ],
+  energyDecisionStructure?: string,    // 2-3 sentences on how energy decisions are made and where
   recentNews: [                        // up to 5 notable recent news items
     {
       headline: string,
@@ -142,8 +158,10 @@ Return a JSON object matching this exact TypeScript interface:
 Rules:
 - Include ALL directors found in Companies House data
 - Actively look for MD, Ops Director, Finance Director, Engineering Director, procurement leads and energy/sustainability roles from search results
+- ALWAYS look for energy buyers and procurement roles: Category Manager Energy/Utilities, Energy Buyer, Group Energy Manager, Head of Estates, Utilities Manager, Facilities Director — these go in category "procurement"
 - For international companies: include both UK contacts AND relevant overseas stakeholders, flagging each with isUKBased and location
-- Procurement roles responsible for energy or sustainability are high priority — include them
+- Set buyerType for anyone in procurement, energy_sustainability, or senior_leadership with energy remit; omit for pure board/governance roles
+- energyDecisionStructure: write this for every company — at minimum note whether energy decisions are UK-led or group-led, and who the key approver is for contracts vs projects
 - annualReportInsights: extract any energy consumption figures, carbon data, or energy strategy commitments found in annual report search results
 - recentNews: include genuine news items only — energy projects, sustainability achievements, awards, investments
 - Set generatedAt to "${new Date().toISOString()}"

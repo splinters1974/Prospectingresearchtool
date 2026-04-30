@@ -67,13 +67,15 @@ export async function searchCompanyPeople(
     mode === 'quick'
       ? [
           `"${companyName}" UK managing director CEO sustainability director`,
-          `"${companyName}" energy manager procurement director leadership`,
+          `"${companyName}" "energy manager" OR "energy buyer" OR "category manager" utilities procurement facilities`,
         ]
       : [
           `"${companyName}" UK managing director CEO CFO operations finance director`,
-          `"${companyName}" sustainability director energy manager ESG procurement`,
+          `"${companyName}" sustainability director energy manager ESG carbon net zero`,
           `"${companyName}" UK leadership team engineering director country manager`,
           `"${companyName}" global chief sustainability officer group energy director`,
+          `"${companyName}" "energy buyer" OR "category manager" utilities procurement "facilities director" OR "head of estates"`,
+          `"${companyName}" "group energy manager" OR "global energy manager" OR "European energy" procurement`,
         ];
   return batchSearch(queries);
 }

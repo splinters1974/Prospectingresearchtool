@@ -9,18 +9,32 @@ function LinkedInIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-import type { Person } from '@/types/research';
+import type { Person, BuyerType } from '@/types/research';
 
 const CATEGORY_LABELS: Record<Person['category'], string> = {
   board: 'Board',
   senior_leadership: 'Senior Leadership',
   energy_sustainability: 'Energy & Sustainability',
+  procurement: 'Procurement',
 };
 
 const CATEGORY_COLOURS: Record<Person['category'], string> = {
   board: 'bg-slate-100 text-slate-700',
   senior_leadership: 'bg-blue-50 text-blue-700',
   energy_sustainability: 'bg-emerald-50 text-emerald-700',
+  procurement: 'bg-orange-50 text-orange-700',
+};
+
+const BUYER_TYPE_LABELS: Record<BuyerType, string> = {
+  supply: 'Supply buyer',
+  solutions: 'Solutions buyer',
+  both: 'Supply & solutions',
+};
+
+const BUYER_TYPE_COLOURS: Record<BuyerType, string> = {
+  supply: 'bg-sky-50 text-sky-700',
+  solutions: 'bg-teal-50 text-teal-700',
+  both: 'bg-violet-50 text-violet-700',
 };
 
 function linkedInSearchUrl(name: string, companyName: string): string {
@@ -34,7 +48,7 @@ interface Props {
 }
 
 export default function PersonCard({ person, companyName }: Props) {
-  const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails = {}, isUKBased, location } = person;
+  const { name, jobTitle, category, buyerType, bio, relevanceToEnergy, contactDetails = {}, isUKBased, location } = person;
   const isOverseas = isUKBased === false;
 
   return (
@@ -53,6 +67,11 @@ export default function PersonCard({ person, companyName }: Props) {
             <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLOURS[category]}`}>
               {CATEGORY_LABELS[category]}
             </span>
+            {buyerType && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${BUYER_TYPE_COLOURS[buyerType]}`}>
+                {BUYER_TYPE_LABELS[buyerType]}
+              </span>
+            )}
             {location && (
               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isOverseas ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-600'}`}>
                 {location}

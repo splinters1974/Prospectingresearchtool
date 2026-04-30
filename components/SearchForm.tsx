@@ -92,7 +92,7 @@ export default function SearchForm({ onSubmit, isLoading }: Props) {
         <span className="text-xs text-slate-400">
           {mode === 'quick'
             ? 'Haiku model · 5 searches · fast'
-            : 'Sonnet model · 9 searches · thorough'}
+            : 'Sonnet model · 11 searches · thorough'}
         </span>
       </div>
 

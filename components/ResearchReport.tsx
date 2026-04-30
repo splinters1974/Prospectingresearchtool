@@ -31,7 +31,11 @@ export default function ResearchReport({ report }: Props) {
       <div id="report-content" className="space-y-5 bg-slate-50 p-4 rounded-xl">
         <BusinessOverview company={report.company} />
         <EnergyBackground energyBackground={report.energyBackground} />
-        <KeyPeople people={report.keyPeople} companyName={report.company.name} />
+        <KeyPeople
+          people={report.keyPeople}
+          companyName={report.company.name}
+          decisionStructure={report.energyDecisionStructure}
+        />
         {report.recentNews && report.recentNews.length > 0 && (
           <RecentNews news={report.recentNews} />
         )}

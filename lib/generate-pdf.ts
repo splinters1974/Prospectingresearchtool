@@ -271,10 +271,29 @@ export function generatePDF(report: ResearchReport): void {
   y += 2;
   y = sectionHeader(pdf, 'Key People', '👥', y);
 
+  // Decision structure callout
+  if (report.energyDecisionStructure) {
+    const dsLines = wrap(pdf, report.energyDecisionStructure, CW - 8);
+    const boxH = dsLines.length * 4.5 + 14;
+    y = checkBreak(pdf, y, boxH);
+    const C_SKY_BG = [240, 249, 255] as const;
+    const C_SKY = [7, 89, 133] as const;
+    drawRect(pdf, M, y, CW, boxH, C_SKY_BG);
+    pdf.setFontSize(8.5);
+    pdf.setFont('helvetica', 'bold');
+    setColor(pdf, C_SKY);
+    pdf.text('⬡  Energy Decision Structure', M + 3, y + 6);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.text(dsLines, M + 3, y + 11);
+    y += boxH + 4;
+  }
+
   const CATEGORIES: { label: string; key: Person['category'] }[] = [
-    { label: 'BOARD / DIRECTORS', key: 'board' },
-    { label: 'SENIOR LEADERSHIP', key: 'senior_leadership' },
+    { label: 'PROCUREMENT & ENERGY BUYING', key: 'procurement' },
     { label: 'ENERGY & SUSTAINABILITY', key: 'energy_sustainability' },
+    { label: 'SENIOR LEADERSHIP', key: 'senior_leadership' },
+    { label: 'BOARD / DIRECTORS', key: 'board' },
   ];
 
   for (const { label, key } of CATEGORIES) {

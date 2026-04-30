@@ -1,5 +1,6 @@
 export type SectorCategory = 'ic' | 'public' | 'education' | 'defence' | 'other';
-export type PersonCategory = 'board' | 'senior_leadership' | 'energy_sustainability';
+export type PersonCategory = 'board' | 'senior_leadership' | 'energy_sustainability' | 'procurement';
+export type BuyerType = 'supply' | 'solutions' | 'both';
 export type DataConfidence = 'high' | 'medium' | 'low';
 
 export interface EnergyProject {
@@ -25,6 +26,7 @@ export interface Person {
   name: string;
   jobTitle: string;
   category: PersonCategory;
+  buyerType?: BuyerType;
   isUKBased?: boolean;
   location?: string;
   bio: string;
@@ -57,6 +59,7 @@ export interface ResearchReport {
     dataConfidence: DataConfidence;
   };
   keyPeople: Person[];
+  energyDecisionStructure?: string;
   recentNews?: NewsItem[];
   researchNotes?: string;
   generatedAt: string;
