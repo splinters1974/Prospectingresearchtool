@@ -18,7 +18,7 @@ interface Props {
 }
 
 export default function PersonCard({ person }: Props) {
-  const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails } = person;
+  const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails = {} } = person;
 
   return (
     <div className="print-card bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">

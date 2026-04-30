@@ -298,7 +298,8 @@ export function generatePDF(report: ResearchReport): void {
       const cardHeight = (p: Person): number => {
         const bioL = wrap(pdf, p.bio || '', cardW - 8).length;
         const relL = wrap(pdf, p.relevanceToEnergy || '', cardW - 8).length;
-        const contacts = [p.contactDetails.email, p.contactDetails.linkedin, p.contactDetails.phone].filter(Boolean).length;
+        const cd = p.contactDetails ?? {};
+        const contacts = [cd.email, cd.linkedin, cd.phone].filter(Boolean).length;
         return 7 + 5 + bioL * 4 + 4 + 4 + relL * 4 + contacts * 4 + 4;
       };
 
@@ -343,9 +344,9 @@ export function generatePDF(report: ResearchReport): void {
         }
 
         const contacts = [
-          p.contactDetails.email ? `✉  ${p.contactDetails.email}` : null,
-          p.contactDetails.phone ? `☎  ${p.contactDetails.phone}` : null,
-          p.contactDetails.linkedin ? `in  ${p.contactDetails.linkedin}` : null,
+          p.contactDetails?.email ? `✉  ${p.contactDetails.email}` : null,
+          p.contactDetails?.phone ? `☎  ${p.contactDetails.phone}` : null,
+          p.contactDetails?.linkedin ? `in  ${p.contactDetails.linkedin}` : null,
         ].filter(Boolean) as string[];
 
         if (contacts.length > 0) {
