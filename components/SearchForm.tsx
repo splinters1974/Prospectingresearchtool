@@ -8,6 +8,13 @@ interface Props {
   isLoading: boolean;
 }
 
+function normaliseUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export default function SearchForm({ onSubmit, isLoading }: Props) {
   const [companyName, setCompanyName] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -15,7 +22,7 @@ export default function SearchForm({ onSubmit, isLoading }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (companyName.trim() && websiteUrl.trim()) {
-      onSubmit(companyName.trim(), websiteUrl.trim());
+      onSubmit(companyName.trim(), normaliseUrl(websiteUrl));
     }
   }
 
@@ -36,8 +43,8 @@ export default function SearchForm({ onSubmit, isLoading }: Props) {
         <div className="relative">
           <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input
-            type="url"
-            placeholder="https://company-website.co.uk"
+            type="text"
+            placeholder="company-website.co.uk"
             value={websiteUrl}
             onChange={(e) => setWebsiteUrl(e.target.value)}
             required
