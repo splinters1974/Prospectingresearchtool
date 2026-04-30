@@ -1,4 +1,14 @@
 import { Mail, Phone, ExternalLink, User, Globe } from 'lucide-react';
+
+function LinkedInIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+      <rect x="2" y="9" width="4" height="12" />
+      <circle cx="4" cy="4" r="2" />
+    </svg>
+  );
+}
 import type { Person } from '@/types/research';
 
 const CATEGORY_LABELS: Record<Person['category'], string> = {
@@ -13,11 +23,17 @@ const CATEGORY_COLOURS: Record<Person['category'], string> = {
   energy_sustainability: 'bg-emerald-50 text-emerald-700',
 };
 
-interface Props {
-  person: Person;
+function linkedInSearchUrl(name: string, companyName: string): string {
+  const q = encodeURIComponent(`${name} ${companyName}`);
+  return `https://www.linkedin.com/search/results/people/?keywords=${q}`;
 }
 
-export default function PersonCard({ person }: Props) {
+interface Props {
+  person: Person;
+  companyName: string;
+}
+
+export default function PersonCard({ person, companyName }: Props) {
   const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails = {}, isUKBased, location } = person;
   const isOverseas = isUKBased === false;
 
@@ -55,39 +71,48 @@ export default function PersonCard({ person }: Props) {
         </div>
       )}
 
-      {(contactDetails.email || contactDetails.phone || contactDetails.linkedin) && (
-        <div className="border-t border-slate-100 pt-3 flex flex-col gap-1.5">
-          {contactDetails.email && (
-            <a
-              href={`mailto:${contactDetails.email}`}
-              className="flex items-center gap-2 text-xs text-slate-600 hover:text-emerald-600 transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">{contactDetails.email}</span>
-            </a>
-          )}
-          {contactDetails.phone && (
-            <a
-              href={`tel:${contactDetails.phone}`}
-              className="flex items-center gap-2 text-xs text-slate-600 hover:text-emerald-600 transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 shrink-0" />
-              <span>{contactDetails.phone}</span>
-            </a>
-          )}
-          {contactDetails.linkedin && (
-            <a
-              href={contactDetails.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-xs text-slate-600 hover:text-emerald-600 transition-colors"
-            >
-              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-              <span className="truncate">{contactDetails.linkedin}</span>
-            </a>
-          )}
-        </div>
-      )}
+      <div className="border-t border-slate-100 pt-3 flex flex-col gap-1.5">
+        {contactDetails.email && (
+          <a
+            href={`mailto:${contactDetails.email}`}
+            className="flex items-center gap-2 text-xs text-slate-600 hover:text-emerald-600 transition-colors"
+          >
+            <Mail className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{contactDetails.email}</span>
+          </a>
+        )}
+        {contactDetails.phone && (
+          <a
+            href={`tel:${contactDetails.phone}`}
+            className="flex items-center gap-2 text-xs text-slate-600 hover:text-emerald-600 transition-colors"
+          >
+            <Phone className="w-3.5 h-3.5 shrink-0" />
+            <span>{contactDetails.phone}</span>
+          </a>
+        )}
+        {contactDetails.linkedin ? (
+          <a
+            href={contactDetails.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-slate-600 hover:text-blue-600 transition-colors"
+          >
+            <LinkedInIcon className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">LinkedIn profile</span>
+          </a>
+        ) : (
+          <a
+            href={linkedInSearchUrl(name, companyName)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-xs text-slate-400 hover:text-blue-600 transition-colors"
+          >
+            <LinkedInIcon className="w-3.5 h-3.5 shrink-0" />
+            <span>Find on LinkedIn</span>
+            <ExternalLink className="w-3 h-3 shrink-0 ml-auto" />
+          </a>
+        )}
+      </div>
     </div>
   );
 }

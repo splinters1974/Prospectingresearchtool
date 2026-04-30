@@ -4,9 +4,10 @@ import type { Person } from '@/types/research';
 
 interface Props {
   people: Person[];
+  companyName: string;
 }
 
-export default function KeyPeople({ people }: Props) {
+export default function KeyPeople({ people, companyName }: Props) {
   if (people.length === 0) return null;
 
   const board = people.filter((p) => p.category === 'board');
@@ -21,25 +22,25 @@ export default function KeyPeople({ people }: Props) {
       </h3>
 
       {board.length > 0 && (
-        <Section title="Board / Directors" people={board} />
+        <Section title="Board / Directors" people={board} companyName={companyName} />
       )}
       {leadership.length > 0 && (
-        <Section title="Senior Leadership" people={leadership} />
+        <Section title="Senior Leadership" people={leadership} companyName={companyName} />
       )}
       {energy.length > 0 && (
-        <Section title="Energy & Sustainability" people={energy} />
+        <Section title="Energy & Sustainability" people={energy} companyName={companyName} />
       )}
     </div>
   );
 }
 
-function Section({ title, people }: { title: string; people: Person[] }) {
+function Section({ title, people, companyName }: { title: string; people: Person[]; companyName: string }) {
   return (
     <div>
       <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">{title}</h4>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {people.map((person, i) => (
-          <PersonCard key={i} person={person} />
+          <PersonCard key={i} person={person} companyName={companyName} />
         ))}
       </div>
     </div>
