@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchCompany, getOfficers, formatAddress } from '@/lib/companies-house';
-import { searchCompanyEnergy, searchCompanyPeople } from '@/lib/web-search';
+import { searchCompany, getOfficers, getFilingHistory, formatAddress, formatFilings } from '@/lib/companies-house';
+import { searchCompanyEnergy, searchCompanyPeople, searchCompanyNews } from '@/lib/web-search';
 import { scrapeCompanyWebsite } from '@/lib/scraper';
 import { synthesiseReport } from '@/lib/claude';
 import type { ResearchRequest } from '@/types/research';
@@ -21,18 +21,23 @@ export async function POST(req: NextRequest) {
   }
 
   // Gather all data sources in parallel
-  const [chCompany, websiteContent, energyResults, peopleResults] = await Promise.all([
+  const [chCompany, websiteContent, energyResults, peopleResults, newsResults] = await Promise.all([
     searchCompany(companyName),
     scrapeCompanyWebsite(websiteUrl),
     searchCompanyEnergy(companyName),
     searchCompanyPeople(companyName),
+    searchCompanyNews(companyName),
   ]);
 
-  let officersText = '';
   let chText = '';
+  let filingHistory = '';
 
   if (chCompany) {
-    const officers = await getOfficers(chCompany.company_number);
+    const [officers, filings] = await Promise.all([
+      getOfficers(chCompany.company_number),
+      getFilingHistory(chCompany.company_number),
+    ]);
+
     chText = [
       `Company: ${chCompany.title}`,
       `Number: ${chCompany.company_number}`,
@@ -43,11 +48,13 @@ export async function POST(req: NextRequest) {
       `SIC codes: ${(chCompany.sic_codes ?? []).join(', ')}`,
     ].join('\n');
 
-    officersText = officers
+    const officersText = officers
       .map((o) => `- ${o.name} (${o.officer_role}${o.occupation ? `, ${o.occupation}` : ''})`)
       .join('\n');
 
     if (officersText) chText += `\n\nCurrent Officers:\n${officersText}`;
+
+    filingHistory = formatFilings(filings);
   }
 
   try {
@@ -58,6 +65,8 @@ export async function POST(req: NextRequest) {
       websiteContent,
       energySearchResults: energyResults,
       peopleSearchResults: peopleResults,
+      newsResults,
+      filingHistory,
     });
 
     return NextResponse.json(report);

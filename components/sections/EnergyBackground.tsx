@@ -19,6 +19,7 @@ export default function EnergyBackground({ energyBackground }: Props) {
     regulatoryObligations,
     certifications,
     keyFacts,
+    annualReportInsights,
     dataConfidence,
   } = energyBackground;
 
@@ -123,6 +124,16 @@ export default function EnergyBackground({ energyBackground }: Props) {
           </div>
         )}
       </div>
+
+      {annualReportInsights && (
+        <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+          <h4 className="text-sm font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+            <Award className="w-4 h-4 text-slate-500" />
+            Annual Report Insights
+          </h4>
+          <p className="text-sm text-slate-600 leading-relaxed">{annualReportInsights}</p>
+        </div>
+      )}
     </div>
   );
 }

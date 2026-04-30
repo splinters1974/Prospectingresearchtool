@@ -17,6 +17,8 @@ UK energy context you understand deeply:
 - Heat decarbonisation: heat pumps replacing gas boilers
 - EV fleet electrification
 - Scope 1, 2, 3 emissions terminology
+- TCFD (Task Force on Climate-related Financial Disclosures): mandatory for large UK companies
+- Carbon Border Adjustment Mechanism (CBAM): relevant for industrial importers/exporters
 
 Sector characteristics:
 - I&C (Industrial & Commercial): high energy intensity, ESOS/SECR likely applies, energy a major cost
@@ -24,6 +26,27 @@ Sector characteristics:
 - Education: universities have net zero strategies; schools less so; Salix loans available
 - Defence: MOD Net Zero targets, complex procurement rules
 - Healthcare: NHS net zero 2040 target (Scope 1&2), 2045 (Scope 3)
+
+INTERNATIONAL BUSINESSES:
+- If a company is a multinational or overseas-headquartered business, identify BOTH:
+  1. UK-specific contacts: UK MD/CEO, UK Operations Director, UK Finance Director, UK Engineering Director, UK energy/sustainability/procurement leads
+  2. Global/overseas stakeholders: Group CSO, Global Head of Energy, Group Sustainability Director — note their location and global remit
+- For UK operations of international companies, ESOS/SECR still applies to UK entities above thresholds
+- Note where decisions may be made centrally vs locally (e.g. energy procurement centralised at HQ)
+
+KEY PEOPLE TO IDENTIFY:
+Prioritise finding ALL of the following roles where they exist:
+1. Board/Directors: CEO, MD, CFO, Chairman (from Companies House + search)
+2. Senior UK Leadership: UK Managing Director, UK Operations Director, UK Finance Director, UK Engineering/Technical Director
+3. Energy & Sustainability: Head of Sustainability, Sustainability Director, Energy Manager, Carbon Manager, ESG Director, Environment Manager, Head of Net Zero, Facilities Director (if energy responsible)
+4. Procurement: Procurement Director, Head of Procurement, Category Manager (Energy or Sustainability), Supply Chain Director
+5. Global stakeholders (for international cos): Chief Sustainability Officer (Group), Group Energy Director, VP Sustainability
+
+ANNUAL REPORTS & ACCOUNTS:
+- Companies House filing history shows when accounts were filed and the period covered
+- Use this data to understand the company's reporting cadence and financial period
+- Cross-reference with sustainability/energy search results to find energy & carbon data from those annual reports
+- Look for: total energy consumption (kWh/MWh), carbon emissions (tCO2e), energy spend, year-on-year trends, stated energy reduction targets
 
 When data is limited, make reasonable inferences based on sector and company size, but clearly flag what is inferred vs. explicitly stated.
 
@@ -35,7 +58,9 @@ function buildUserPrompt(
   companiesHouseData: string,
   websiteContent: string,
   energySearchResults: string,
-  peopleSearchResults: string
+  peopleSearchResults: string,
+  newsResults: string,
+  filingHistory: string
 ): string {
   return `Research the following company and return a structured JSON report.
 
@@ -44,6 +69,9 @@ WEBSITE: ${websiteUrl}
 
 === COMPANIES HOUSE DATA ===
 ${companiesHouseData || 'No data retrieved'}
+
+=== COMPANIES HOUSE FILING HISTORY (Annual Accounts) ===
+${filingHistory || 'No filing history retrieved'}
 
 === COMPANY WEBSITE CONTENT ===
 ${websiteContent || 'No content retrieved'}
@@ -54,6 +82,9 @@ ${energySearchResults || 'No results'}
 === PEOPLE & LEADERSHIP SEARCH RESULTS ===
 ${peopleSearchResults || 'No results'}
 
+=== NEWS & PRESS RELEASES ===
+${newsResults || 'No results'}
+
 Return a JSON object matching this exact TypeScript interface:
 
 {
@@ -61,21 +92,23 @@ Return a JSON object matching this exact TypeScript interface:
     name: string,
     companiesHouseNumber?: string,
     registeredAddress?: string,
-    sector: string,                    // human-readable sector description
+    sector: string,
     sectorCategory: "ic" | "public" | "education" | "defence" | "other",
-    description: string,               // 2-3 sentence overview of what they do
+    description: string,               // 2-3 sentences covering what they do and whether UK-only or international
     employeeCount?: string,
     annualTurnover?: string,
     locations: string[],               // UK locations they operate from
-    website: string
+    website: string,
+    isInternational?: boolean          // true if HQ is outside UK or multinational
   },
   energyBackground: {
-    summary: string,                   // 2-3 sentence energy/carbon summary
-    netZeroTarget?: string,            // e.g. "Net zero by 2040"
+    summary: string,                   // 2-3 sentence energy/carbon summary including any annual report data
+    netZeroTarget?: string,
     energyProjects: [{ title: string, description: string, year?: string }],
-    regulatoryObligations: string[],   // e.g. ["ESOS", "SECR"]
-    certifications: string[],          // e.g. ["ISO 50001", "BREEAM Excellent"]
-    keyFacts: string[],                // 3-5 notable energy/carbon facts
+    regulatoryObligations: string[],   // ESOS, SECR, TCFD, etc.
+    certifications: string[],
+    keyFacts: string[],                // 4-6 facts including any annual report energy/carbon figures
+    annualReportInsights?: string,     // key energy/carbon findings from annual accounts if available
     dataConfidence: "high" | "medium" | "low"
   },
   keyPeople: [
@@ -83,8 +116,10 @@ Return a JSON object matching this exact TypeScript interface:
       name: string,
       jobTitle: string,
       category: "board" | "senior_leadership" | "energy_sustainability",
-      bio: string,                     // 1-2 sentences about the person
-      relevanceToEnergy: string,       // why they matter for an energy sale
+      isUKBased?: boolean,             // false for overseas stakeholders at international companies
+      location?: string,               // e.g. "UK", "USA (Global HQ)", "Germany"
+      bio: string,
+      relevanceToEnergy: string,
       contactDetails: {
         email?: string,
         phone?: string,
@@ -92,18 +127,28 @@ Return a JSON object matching this exact TypeScript interface:
       }
     }
   ],
-  researchNotes?: string,              // gaps, caveats, or important context
-  generatedAt: string                  // ISO 8601 timestamp
+  recentNews: [                        // up to 5 notable recent news items
+    {
+      headline: string,
+      summary: string,
+      date?: string,
+      url?: string
+    }
+  ],
+  researchNotes?: string,
+  generatedAt: string
 }
 
 Rules:
 - Include ALL directors found in Companies House data
-- Add any energy/sustainability/facilities roles found in search results
-- Senior leadership = C-suite, MD, directors not on Companies House list
+- Actively look for MD, Ops Director, Finance Director, Engineering Director, procurement leads and energy/sustainability roles from search results
+- For international companies: include both UK contacts AND relevant overseas stakeholders, flagging each with isUKBased and location
+- Procurement roles responsible for energy or sustainability are high priority — include them
+- annualReportInsights: extract any energy consumption figures, carbon data, or energy strategy commitments found in annual report search results
+- recentNews: include genuine news items only — energy projects, sustainability achievements, awards, investments
 - Set generatedAt to "${new Date().toISOString()}"
-- If a field is unknown, omit it (don't set to null or "Unknown")
-- keyFacts should include whether ESOS/SECR likely applies based on company size
-- Be specific about energy projects — avoid generic statements`;
+- If a field is unknown, omit it
+- keyFacts should include whether ESOS/SECR/TCFD likely applies and any figures from annual reports`;
 }
 
 export async function synthesiseReport(params: {
@@ -113,6 +158,8 @@ export async function synthesiseReport(params: {
   websiteContent: string;
   energySearchResults: string;
   peopleSearchResults: string;
+  newsResults: string;
+  filingHistory: string;
 }): Promise<ResearchReport> {
   const userPrompt = buildUserPrompt(
     params.companyName,
@@ -120,12 +167,14 @@ export async function synthesiseReport(params: {
     params.companiesHouseData,
     params.websiteContent,
     params.energySearchResults,
-    params.peopleSearchResults
+    params.peopleSearchResults,
+    params.newsResults,
+    params.filingHistory
   );
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 4096,
+    max_tokens: 6000,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userPrompt }],
   });
@@ -135,7 +184,6 @@ export async function synthesiseReport(params: {
     .map((b) => (b as { type: 'text'; text: string }).text)
     .join('');
 
-  // Extract JSON from response (strip any accidental markdown fences)
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error('Claude did not return valid JSON');
 

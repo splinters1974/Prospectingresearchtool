@@ -1,4 +1,4 @@
-import { Mail, Phone, ExternalLink, User } from 'lucide-react';
+import { Mail, Phone, ExternalLink, User, Globe } from 'lucide-react';
 import type { Person } from '@/types/research';
 
 const CATEGORY_LABELS: Record<Person['category'], string> = {
@@ -18,22 +18,31 @@ interface Props {
 }
 
 export default function PersonCard({ person }: Props) {
-  const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails = {} } = person;
+  const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails = {}, isUKBased, location } = person;
+  const isOverseas = isUKBased === false;
 
   return (
     <div className="print-card bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
-          <User className="w-5 h-5 text-slate-400" />
+        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${isOverseas ? 'bg-amber-50' : 'bg-slate-100'}`}>
+          {isOverseas
+            ? <Globe className="w-5 h-5 text-amber-500" />
+            : <User className="w-5 h-5 text-slate-400" />
+          }
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-slate-900 text-sm leading-tight">{name}</p>
           <p className="text-slate-500 text-xs mt-0.5 leading-tight">{jobTitle}</p>
-          <span
-            className={`inline-block mt-1.5 text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLOURS[category]}`}
-          >
-            {CATEGORY_LABELS[category]}
-          </span>
+          <div className="flex flex-wrap gap-1.5 mt-1.5">
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${CATEGORY_COLOURS[category]}`}>
+              {CATEGORY_LABELS[category]}
+            </span>
+            {location && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isOverseas ? 'bg-amber-50 text-amber-700' : 'bg-slate-50 text-slate-600'}`}>
+                {location}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

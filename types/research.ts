@@ -8,6 +8,13 @@ export interface EnergyProject {
   year?: string;
 }
 
+export interface NewsItem {
+  headline: string;
+  summary: string;
+  date?: string;
+  url?: string;
+}
+
 export interface ContactDetails {
   email?: string;
   phone?: string;
@@ -18,6 +25,8 @@ export interface Person {
   name: string;
   jobTitle: string;
   category: PersonCategory;
+  isUKBased?: boolean;
+  location?: string;
   bio: string;
   relevanceToEnergy: string;
   contactDetails: ContactDetails;
@@ -35,6 +44,7 @@ export interface ResearchReport {
     annualTurnover?: string;
     locations: string[];
     website: string;
+    isInternational?: boolean;
   };
   energyBackground: {
     summary: string;
@@ -43,9 +53,11 @@ export interface ResearchReport {
     regulatoryObligations: string[];
     certifications: string[];
     keyFacts: string[];
+    annualReportInsights?: string;
     dataConfidence: DataConfidence;
   };
   keyPeople: Person[];
+  recentNews?: NewsItem[];
   researchNotes?: string;
   generatedAt: string;
 }
