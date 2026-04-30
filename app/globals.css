@@ -5,3 +5,69 @@
 body {
   background: #f8fafc;
 }
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm 18mm;
+  }
+
+  /* Hide everything except the report */
+  body > * {
+    display: none !important;
+  }
+
+  /* Show only the main content area */
+  body > div {
+    display: block !important;
+  }
+
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset backgrounds */
+  body,
+  #report-content,
+  main {
+    background: white !important;
+  }
+
+  /* Make the report fill the page */
+  #report-content {
+    background: white !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Cards — avoid splitting across pages */
+  .rounded-xl {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #e2e8f0 !important;
+    margin-bottom: 10mm;
+    border-radius: 6px !important;
+  }
+
+  /* Person cards — 2 columns on A4 */
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Ensure text is print-friendly */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Remove shadows */
+  * {
+    box-shadow: none !important;
+  }
+
+  /* Ensure links don't show URLs */
+  a::after {
+    content: none !important;
+  }
+}

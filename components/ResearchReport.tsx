@@ -17,7 +17,12 @@ export default function ResearchReport({ report }: Props) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      {/* Print-only header */}
+      <div className="hidden print:block mb-6">
+        <p className="text-xs text-slate-400">UK Energy &amp; Carbon Intelligence Briefing &mdash; Generated {formatted}</p>
+      </div>
+
+      <div className="no-print flex items-center justify-between mb-4">
         <p className="text-xs text-slate-400">Generated {formatted}</p>
         <ExportButton companyName={report.company.name} />
       </div>

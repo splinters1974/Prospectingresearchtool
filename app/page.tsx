@@ -41,7 +41,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="bg-slate-900 border-b border-slate-800">
+      <header className="no-print bg-slate-900 border-b border-slate-800">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
           <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
             <Zap className="w-5 h-5 text-white" />
@@ -54,7 +54,7 @@ export default function Home() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="no-print bg-white rounded-xl border border-slate-200 p-6">
           <h2 className="text-slate-900 font-semibold mb-1">Research a prospect</h2>
           <p className="text-slate-500 text-sm mb-5">
             Enter a company name and website to generate an energy &amp; carbon intelligence briefing.
@@ -62,10 +62,10 @@ export default function Home() {
           <SearchForm onSubmit={handleSearch} isLoading={isLoading} />
         </div>
 
-        {isLoading && <LoadingState />}
+        {isLoading && <div className="no-print"><LoadingState /></div>}
 
         {error && !isLoading && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-red-700 text-sm">
+          <div className="no-print bg-red-50 border border-red-200 rounded-xl p-5 text-red-700 text-sm">
             {error}
           </div>
         )}
@@ -73,7 +73,7 @@ export default function Home() {
         {report && !isLoading && <ResearchReport report={report} />}
 
         {!isLoading && !report && !error && (
-          <div className="text-center py-16 text-slate-400">
+          <div className="no-print text-center py-16 text-slate-400">
             <Zap className="w-10 h-10 mx-auto mb-3 text-slate-300" />
             <p className="text-sm">Your energy intelligence briefing will appear here</p>
           </div>
