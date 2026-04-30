@@ -12,31 +12,31 @@ body {
     margin: 15mm 18mm;
   }
 
-  /* Hide everything except the report */
-  body > * {
-    display: none !important;
-  }
-
-  /* Show only the main content area */
-  body > div {
-    display: block !important;
-  }
-
+  /* Hide non-report elements */
   header,
   .no-print {
     display: none !important;
   }
 
-  /* Reset backgrounds */
+  /* Clean white backgrounds throughout — prevents rasterisation */
+  *,
+  *::before,
+  *::after {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
   body,
   #report-content,
   main {
     background: white !important;
+    color: #0f172a !important;
   }
 
-  /* Make the report fill the page */
   #report-content {
-    background: white !important;
     padding: 0 !important;
     border-radius: 0 !important;
   }
@@ -45,9 +45,22 @@ body {
   .rounded-xl {
     break-inside: avoid;
     page-break-inside: avoid;
-    border: 1px solid #e2e8f0 !important;
-    margin-bottom: 10mm;
-    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    margin-bottom: 8mm;
+    border-radius: 4px !important;
+  }
+
+  /* Make all text dark for print */
+  p, h1, h2, h3, h4, h5, span, li, a {
+    color: #0f172a !important;
+  }
+
+  /* Badges / chips — border instead of coloured background */
+  [class*="rounded-full"],
+  [class*="rounded-lg"] {
+    border: 1px solid #94a3b8 !important;
+    background: white !important;
+    color: #0f172a !important;
   }
 
   /* Person cards — 2 columns on A4 */
@@ -55,18 +68,7 @@ body {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* Ensure text is print-friendly */
-  * {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Remove shadows */
-  * {
-    box-shadow: none !important;
-  }
-
-  /* Ensure links don't show URLs */
+  /* No URL expansion on links */
   a::after {
     content: none !important;
   }
