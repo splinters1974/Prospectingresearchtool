@@ -1,16 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchForm from '@/components/SearchForm';
 import LoadingState from '@/components/LoadingState';
 import ResearchReport from '@/components/ResearchReport';
+import RecentSearches from '@/components/RecentSearches';
 import type { ResearchReport as ReportType } from '@/types/research';
+import { saveToCache, getAllCacheEntries, type CacheEntry } from '@/lib/cache';
 import { Zap } from 'lucide-react';
 
 export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState<ReportType | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cacheEntries, setCacheEntries] = useState<CacheEntry[]>([]);
+
+  useEffect(() => {
+    setCacheEntries(getAllCacheEntries());
+  }, []);
 
   async function handleSearch(companyName: string, websiteUrl: string) {
     setIsLoading(true);
@@ -31,11 +38,28 @@ export default function Home() {
         return;
       }
 
-      setReport(data as ReportType);
+      const result = data as ReportType;
+      saveToCache(companyName, websiteUrl, result);
+      setCacheEntries(getAllCacheEntries());
+      setReport(result);
     } catch {
       setError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  function handleSelectCached(entry: CacheEntry) {
+    setReport(entry.report);
+    setError(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleDeleteCached(companyName: string) {
+    setCacheEntries(getAllCacheEntries());
+    // Clear report if it's the one being deleted
+    if (report?.company.name.toLowerCase().trim() === companyName.toLowerCase().trim()) {
+      setReport(null);
     }
   }
 
@@ -53,7 +77,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
         <div className="no-print bg-white rounded-xl border border-slate-200 p-6">
           <h2 className="text-slate-900 font-semibold mb-1">Research a prospect</h2>
           <p className="text-slate-500 text-sm mb-5">
@@ -72,12 +96,18 @@ export default function Home() {
 
         {report && !isLoading && <ResearchReport report={report} />}
 
-        {!isLoading && !report && !error && (
+        {!isLoading && !report && !error && cacheEntries.length === 0 && (
           <div className="no-print text-center py-16 text-slate-400">
             <Zap className="w-10 h-10 mx-auto mb-3 text-slate-300" />
             <p className="text-sm">Your energy intelligence briefing will appear here</p>
           </div>
         )}
+
+        <RecentSearches
+          entries={cacheEntries}
+          onSelect={handleSelectCached}
+          onDelete={handleDeleteCached}
+        />
       </main>
     </div>
   );
