@@ -24,7 +24,7 @@ export default function ResearchReport({ report }: Props) {
 
       <div className="no-print flex items-center justify-between mb-4">
         <p className="text-xs text-slate-400">Generated {formatted}</p>
-        <ExportButton companyName={report.company.name} />
+        <ExportButton report={report} />
       </div>
 
       <div id="report-content" className="space-y-5 bg-slate-50 p-4 rounded-xl">

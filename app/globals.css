@@ -12,13 +12,12 @@ body {
     margin: 15mm 18mm;
   }
 
-  /* Hide non-report elements */
   header,
   .no-print {
     display: none !important;
   }
 
-  /* Clean white backgrounds throughout — prevents rasterisation */
+  /* Clean white — prevents rasterisation and keeps file small */
   *,
   *::before,
   *::after {
@@ -27,13 +26,13 @@ body {
     background-image: none !important;
     box-shadow: none !important;
     text-shadow: none !important;
+    color: #0f172a !important;
   }
 
   body,
   #report-content,
   main {
     background: white !important;
-    color: #0f172a !important;
   }
 
   #report-content {
@@ -41,34 +40,35 @@ body {
     border-radius: 0 !important;
   }
 
-  /* Cards — avoid splitting across pages */
-  .rounded-xl {
+  /* Only the top-level section cards avoid page breaks — NOT every card */
+  .print-section {
     break-inside: avoid;
     page-break-inside: avoid;
-    border: 1px solid #cbd5e1 !important;
-    margin-bottom: 8mm;
-    border-radius: 4px !important;
   }
 
-  /* Make all text dark for print */
-  p, h1, h2, h3, h4, h5, span, li, a {
-    color: #0f172a !important;
+  /* Person cards: prefer not to break but allow it if they must */
+  .print-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
-  /* Badges / chips — border instead of coloured background */
-  [class*="rounded-full"],
-  [class*="rounded-lg"] {
-    border: 1px solid #94a3b8 !important;
-    background: white !important;
-    color: #0f172a !important;
+  /* Section headings stay with their content */
+  h3, h4 {
+    break-after: avoid;
+    page-break-after: avoid;
   }
 
-  /* Person cards — 2 columns on A4 */
+  /* Borders for cards */
+  .rounded-xl,
+  .rounded-lg {
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Person grid: 2 columns on A4 */
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  /* No URL expansion on links */
   a::after {
     content: none !important;
   }

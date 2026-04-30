@@ -26,7 +26,7 @@ export default function BusinessOverview({ company }: Props) {
   const sectorLabel = SECTOR_LABELS[company.sectorCategory] ?? company.sectorCategory;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6">
+    <div className="print-section bg-white rounded-xl border border-slate-200 p-6">
       <div className="flex items-start justify-between gap-4 mb-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900">{company.name}</h2>

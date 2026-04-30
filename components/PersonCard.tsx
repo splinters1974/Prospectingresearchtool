@@ -21,7 +21,7 @@ export default function PersonCard({ person }: Props) {
   const { name, jobTitle, category, bio, relevanceToEnergy, contactDetails } = person;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+    <div className="print-card bg-white rounded-xl border border-slate-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
           <User className="w-5 h-5 text-slate-400" />

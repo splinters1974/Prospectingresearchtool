@@ -26,7 +26,7 @@ export default function EnergyBackground({ energyBackground }: Props) {
   const ConfIcon = conf.icon;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5">
+    <div className="bg-white rounded-xl border border-slate-200 p-6 space-y-5 print-section">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
           <Leaf className="w-5 h-5 text-emerald-600" />
