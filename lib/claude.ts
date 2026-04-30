@@ -160,6 +160,7 @@ export async function synthesiseReport(params: {
   peopleSearchResults: string;
   newsResults: string;
   filingHistory: string;
+  mode: 'quick' | 'full';
 }): Promise<ResearchReport> {
   const userPrompt = buildUserPrompt(
     params.companyName,
@@ -172,9 +173,13 @@ export async function synthesiseReport(params: {
     params.filingHistory
   );
 
+  const model =
+    params.mode === 'quick' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6';
+  const maxTokens = params.mode === 'quick' ? 3000 : 6000;
+
   const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 6000,
+    model,
+    max_tokens: maxTokens,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userPrompt }],
   });

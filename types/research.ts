@@ -65,6 +65,7 @@ export interface ResearchReport {
 export interface ResearchRequest {
   companyName: string;
   websiteUrl: string;
+  mode: 'quick' | 'full';
 }
 
 export interface ResearchProgress {

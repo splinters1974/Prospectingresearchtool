@@ -15,18 +15,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  const { companyName, websiteUrl } = body;
+  const { companyName, websiteUrl, mode = 'full' } = body;
   if (!companyName?.trim() || !websiteUrl?.trim()) {
     return NextResponse.json({ error: 'companyName and websiteUrl are required' }, { status: 400 });
   }
 
-  // Gather all data sources in parallel
   const [chCompany, websiteContent, energyResults, peopleResults, newsResults] = await Promise.all([
     searchCompany(companyName),
-    scrapeCompanyWebsite(websiteUrl),
-    searchCompanyEnergy(companyName),
-    searchCompanyPeople(companyName),
-    searchCompanyNews(companyName),
+    scrapeCompanyWebsite(websiteUrl, mode),
+    searchCompanyEnergy(companyName, mode),
+    searchCompanyPeople(companyName, mode),
+    searchCompanyNews(companyName, mode),
   ]);
 
   let chText = '';
@@ -53,7 +52,6 @@ export async function POST(req: NextRequest) {
       .join('\n');
 
     if (officersText) chText += `\n\nCurrent Officers:\n${officersText}`;
-
     filingHistory = formatFilings(filings);
   }
 
@@ -67,6 +65,7 @@ export async function POST(req: NextRequest) {
       peopleSearchResults: peopleResults,
       newsResults,
       filingHistory,
+      mode,
     });
 
     return NextResponse.json(report);

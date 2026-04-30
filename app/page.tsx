@@ -19,7 +19,7 @@ export default function Home() {
     setCacheEntries(getAllCacheEntries());
   }, []);
 
-  async function handleSearch(companyName: string, websiteUrl: string) {
+  async function handleSearch(companyName: string, websiteUrl: string, mode: 'quick' | 'full') {
     setIsLoading(true);
     setReport(null);
     setError(null);
@@ -28,7 +28,7 @@ export default function Home() {
       const res = await fetch('/api/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ companyName, websiteUrl }),
+        body: JSON.stringify({ companyName, websiteUrl, mode }),
       });
 
       const data = await res.json();

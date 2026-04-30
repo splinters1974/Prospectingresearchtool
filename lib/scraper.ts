@@ -1,4 +1,6 @@
-const PAGES_TO_TRY = [
+const PAGES_QUICK = ['', '/about', '/about-us', '/sustainability', '/leadership', '/team'];
+
+const PAGES_FULL = [
   '',
   '/about',
   '/about-us',
@@ -33,7 +35,7 @@ function htmlToText(html: string): string {
     .trim();
 }
 
-async function fetchPage(url: string): Promise<string> {
+async function fetchPage(url: string, maxChars: number): Promise<string> {
   try {
     const res = await fetch(url, {
       headers: {
@@ -45,29 +47,31 @@ async function fetchPage(url: string): Promise<string> {
     });
     if (!res.ok) return '';
     const html = await res.text();
-    const text = htmlToText(html);
-    // Return up to 3000 chars per page to keep context manageable
-    return text.slice(0, 3000);
+    return htmlToText(html).slice(0, maxChars);
   } catch {
     return '';
   }
 }
 
-export async function scrapeCompanyWebsite(websiteUrl: string): Promise<string> {
+export async function scrapeCompanyWebsite(
+  websiteUrl: string,
+  mode: 'quick' | 'full' = 'full'
+): Promise<string> {
   const base = normaliseUrl(websiteUrl);
+  const pages = mode === 'quick' ? PAGES_QUICK : PAGES_FULL;
+  const maxChars = mode === 'quick' ? 1500 : 3000;
 
   const results = await Promise.allSettled(
-    PAGES_TO_TRY.map((path) => fetchPage(`${base}${path}`))
+    pages.map((path) => fetchPage(`${base}${path}`, maxChars))
   );
 
-  const pages = results
+  const fetched = results
     .map((r) => (r.status === 'fulfilled' ? r.value : ''))
     .filter(Boolean);
 
-  // Deduplicate near-identical pages (same first 200 chars)
   const seen = new Set<string>();
   const unique: string[] = [];
-  for (const page of pages) {
+  for (const page of fetched) {
     const key = page.slice(0, 200);
     if (!seen.has(key)) {
       seen.add(key);

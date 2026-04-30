@@ -32,7 +32,6 @@ async function tavilySearch(query: string): Promise<string> {
   }
 }
 
-// Run queries sequentially in batches to avoid overwhelming Tavily
 async function batchSearch(queries: string[]): Promise<string> {
   const results: string[] = [];
   for (const q of queries) {
@@ -42,29 +41,53 @@ async function batchSearch(queries: string[]): Promise<string> {
   return results.join('\n\n---\n\n');
 }
 
-export async function searchCompanyEnergy(companyName: string): Promise<string> {
-  const queries = [
-    `"${companyName}" net zero carbon target sustainability UK`,
-    `"${companyName}" ESOS SECR energy carbon annual report`,
-    `"${companyName}" energy projects renewable decarbonisation`,
-  ];
+export async function searchCompanyEnergy(
+  companyName: string,
+  mode: 'quick' | 'full' = 'full'
+): Promise<string> {
+  const queries =
+    mode === 'quick'
+      ? [
+          `"${companyName}" net zero carbon energy sustainability`,
+          `"${companyName}" ESOS SECR annual report energy`,
+        ]
+      : [
+          `"${companyName}" net zero carbon target sustainability UK`,
+          `"${companyName}" ESOS SECR energy carbon annual report`,
+          `"${companyName}" energy projects renewable decarbonisation`,
+        ];
   return batchSearch(queries);
 }
 
-export async function searchCompanyPeople(companyName: string): Promise<string> {
-  const queries = [
-    `"${companyName}" UK managing director CEO CFO operations finance director`,
-    `"${companyName}" sustainability director energy manager ESG procurement`,
-    `"${companyName}" UK leadership team engineering director country manager`,
-    `"${companyName}" global chief sustainability officer group energy director`,
-  ];
+export async function searchCompanyPeople(
+  companyName: string,
+  mode: 'quick' | 'full' = 'full'
+): Promise<string> {
+  const queries =
+    mode === 'quick'
+      ? [
+          `"${companyName}" UK managing director CEO sustainability director`,
+          `"${companyName}" energy manager procurement director leadership`,
+        ]
+      : [
+          `"${companyName}" UK managing director CEO CFO operations finance director`,
+          `"${companyName}" sustainability director energy manager ESG procurement`,
+          `"${companyName}" UK leadership team engineering director country manager`,
+          `"${companyName}" global chief sustainability officer group energy director`,
+        ];
   return batchSearch(queries);
 }
 
-export async function searchCompanyNews(companyName: string): Promise<string> {
-  const queries = [
-    `"${companyName}" energy sustainability news 2024 2025`,
-    `"${companyName}" carbon net zero achievement press release announcement`,
-  ];
+export async function searchCompanyNews(
+  companyName: string,
+  mode: 'quick' | 'full' = 'full'
+): Promise<string> {
+  const queries =
+    mode === 'quick'
+      ? [`"${companyName}" energy sustainability news`]
+      : [
+          `"${companyName}" energy sustainability news 2024 2025`,
+          `"${companyName}" carbon net zero achievement press release announcement`,
+        ];
   return batchSearch(queries);
 }
