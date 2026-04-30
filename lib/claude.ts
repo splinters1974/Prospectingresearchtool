@@ -175,13 +175,18 @@ export async function synthesiseReport(params: {
 
   const model =
     params.mode === 'quick' ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6';
-  const maxTokens = params.mode === 'quick' ? 3000 : 6000;
+  const maxTokens = params.mode === 'quick' ? 5000 : 8000;
+
+  const quickNote =
+    params.mode === 'quick'
+      ? '\n\nQUICK MODE: Be concise. Limit keyPeople to 6 max. Keep bios to 1 sentence. Keep keyFacts to 4 items. Keep energyProjects to 3 max. Keep recentNews to 3 max.'
+      : '';
 
   const message = await client.messages.create({
     model,
     max_tokens: maxTokens,
     system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: userPrompt }],
+    messages: [{ role: 'user', content: userPrompt + quickNote }],
   });
 
   const text = message.content
