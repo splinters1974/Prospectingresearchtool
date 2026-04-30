@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { searchCompany, getOfficers, getFilingHistory, formatAddress, formatFilings } from '@/lib/companies-house';
+import { searchCompany, getOfficers, getFilingHistory, getCompanyProfile, getCharges, formatAddress, formatFilings } from '@/lib/companies-house';
 import { searchCompanyEnergy, searchCompanyPeople, searchCompanyNews } from '@/lib/web-search';
 import { scrapeCompanyWebsite } from '@/lib/scraper';
 import { synthesiseReport } from '@/lib/claude';
-import type { ResearchRequest } from '@/types/research';
+import { computeFinancialHealth } from '@/lib/financial-health';
+import type { ResearchRequest, FinancialHealthCheck } from '@/types/research';
 
 export const maxDuration = 60;
 
@@ -30,12 +31,22 @@ export async function POST(req: NextRequest) {
 
   let chText = '';
   let filingHistory = '';
+  let financialHealth: FinancialHealthCheck | undefined;
 
   if (chCompany) {
-    const [officers, filings] = await Promise.all([
+    const [officers, filings, profile, charges] = await Promise.all([
       getOfficers(chCompany.company_number),
       getFilingHistory(chCompany.company_number),
+      getCompanyProfile(chCompany.company_number),
+      getCharges(chCompany.company_number),
     ]);
+
+    financialHealth = computeFinancialHealth(
+      chCompany.company_status,
+      chCompany.date_of_creation,
+      profile,
+      charges
+    );
 
     chText = [
       `Company: ${chCompany.title}`,
@@ -68,6 +79,7 @@ export async function POST(req: NextRequest) {
       mode,
     });
 
+    if (financialHealth) report.financialHealth = financialHealth;
     return NextResponse.json(report);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

@@ -31,6 +31,31 @@ export interface CHOfficer {
   occupation?: string;
 }
 
+export interface CHCompanyProfile {
+  company_status?: string;
+  has_insolvency_history?: boolean;
+  has_charges?: boolean;
+  accounts?: {
+    next_accounts?: {
+      period_end_on?: string;
+      due_on?: string;
+      overdue?: boolean;
+    };
+    last_accounts?: {
+      type?: string;
+      made_up_to?: string;
+      period_end_on?: string;
+    };
+  };
+}
+
+export interface CHCharge {
+  status?: string;
+  classification?: { type?: string };
+  created_on?: string;
+  persons_entitled?: Array<{ name: string }>;
+}
+
 export interface CHFiling {
   type: string;
   date: string;
@@ -79,6 +104,30 @@ export async function getFilingHistory(companyNumber: string): Promise<CHFiling[
     if (!res.ok) return [];
     const data = await res.json();
     return (data.items ?? []) as CHFiling[];
+  } catch {
+    return [];
+  }
+}
+
+export async function getCompanyProfile(companyNumber: string): Promise<CHCompanyProfile | null> {
+  try {
+    const res = await fetch(`${BASE}/company/${companyNumber}`, { headers: authHeader() });
+    if (!res.ok) return null;
+    return await res.json() as CHCompanyProfile;
+  } catch {
+    return null;
+  }
+}
+
+export async function getCharges(companyNumber: string): Promise<CHCharge[]> {
+  try {
+    const res = await fetch(
+      `${BASE}/company/${companyNumber}/charges?items_per_page=25`,
+      { headers: authHeader() }
+    );
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.items ?? []) as CHCharge[];
   } catch {
     return [];
   }

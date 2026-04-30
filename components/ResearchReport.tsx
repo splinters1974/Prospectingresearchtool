@@ -1,5 +1,6 @@
 import BusinessOverview from '@/components/sections/BusinessOverview';
 import EnergyBackground from '@/components/sections/EnergyBackground';
+import FinancialHealth from '@/components/sections/FinancialHealth';
 import KeyPeople from '@/components/sections/KeyPeople';
 import RecentNews from '@/components/sections/RecentNews';
 import ExportButton from '@/components/ExportButton';
@@ -31,6 +32,9 @@ export default function ResearchReport({ report }: Props) {
       <div id="report-content" className="space-y-5 bg-slate-50 p-4 rounded-xl">
         <BusinessOverview company={report.company} />
         <EnergyBackground energyBackground={report.energyBackground} />
+        {report.financialHealth && (
+          <FinancialHealth check={report.financialHealth} />
+        )}
         <KeyPeople
           people={report.keyPeople}
           companyName={report.company.name}

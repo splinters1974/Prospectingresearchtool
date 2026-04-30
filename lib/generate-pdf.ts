@@ -267,6 +267,88 @@ export function generatePDF(report: ResearchReport): void {
     y += 14;
   }
 
+  // ── FINANCIAL HEALTH CHECK ───────────────────────────────────────────────
+  if (report.financialHealth) {
+    const fh = report.financialHealth;
+    y += 2;
+    y = sectionHeader(pdf, 'Financial Health Check  (Companies House)', '🛡', y);
+
+    // Overall status banner
+    const C_RED_BG = [254, 242, 242] as const;
+    const C_RED_FG = [127, 29, 29] as const;
+    const bannerBg = fh.overallFlag === 'red' ? C_RED_BG : fh.overallFlag === 'amber' ? C_AMBER_BG : C_GREEN_BG;
+    const bannerFg = fh.overallFlag === 'red' ? C_RED_FG : fh.overallFlag === 'amber' ? C_AMBER : C_GREEN_DARK;
+    const headlineLines = wrap(pdf, fh.headline, CW - 8);
+    const bannerH = headlineLines.length * 4.5 + 10;
+    y = checkBreak(pdf, y, bannerH);
+    drawRect(pdf, M, y, CW, bannerH, bannerBg);
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+    setColor(pdf, bannerFg);
+    pdf.text(headlineLines, M + 4, y + 6);
+    y += bannerH + 5;
+
+    // Fact items — 2-column grid
+    const colW = (CW - 4) / 2;
+    const FLAG_COLOURS: Record<string, readonly [number,number,number]> = {
+      green: C_GREEN, amber: [217, 119, 6], red: [220, 38, 38], neutral: [148, 163, 184],
+    };
+
+    for (let i = 0; i < fh.items.length; i += 2) {
+      const left = fh.items[i];
+      const right = fh.items[i + 1] ?? null;
+
+      const itemHeight = (item: typeof left) => {
+        const detailLines = wrap(pdf, item.detail, colW - 8).length;
+        return 5 + 4 + 4 + detailLines * 3.8 + 4;
+      };
+
+      const h = Math.max(itemHeight(left), right ? itemHeight(right) : 0);
+      y = checkBreak(pdf, y, h);
+
+      const drawItem = (item: typeof left, x: number) => {
+        const dotColor = FLAG_COLOURS[item.flag] ?? FLAG_COLOURS.neutral;
+        setFill(pdf, dotColor);
+        pdf.circle(x + 2, y + 3, 1.2, 'F');
+
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica', 'bold');
+        setColor(pdf, C_LIGHT);
+        pdf.text(item.label.toUpperCase(), x + 5, y + 4);
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        setColor(pdf, dotColor);
+        pdf.text(item.value, x + 5, y + 9);
+
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica', 'normal');
+        setColor(pdf, C_MID);
+        const detailLines = wrap(pdf, item.detail, colW - 8);
+        pdf.text(detailLines, x + 5, y + 13.5);
+      };
+
+      drawItem(left, M);
+      if (right) drawItem(right, M + colW + 4);
+
+      // Divider line between rows
+      y += h;
+      setDraw(pdf, C_BORDER);
+      pdf.setLineWidth(0.1);
+      pdf.line(M, y, M + CW, y);
+      y += 4;
+    }
+
+    // Disclaimer
+    y = checkBreak(pdf, y, 10);
+    pdf.setFontSize(7);
+    pdf.setFont('helvetica', 'italic');
+    setColor(pdf, C_LIGHT);
+    const discLines = wrap(pdf, fh.disclaimer, CW);
+    pdf.text(discLines, M, y);
+    y += discLines.length * 3.5 + 6;
+  }
+
   // ── KEY PEOPLE ──────────────────────────────────────────────────────────
   y += 2;
   y = sectionHeader(pdf, 'Key People', '👥', y);

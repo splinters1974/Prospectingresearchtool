@@ -2,6 +2,21 @@ export type SectorCategory = 'ic' | 'public' | 'education' | 'defence' | 'other'
 export type PersonCategory = 'board' | 'senior_leadership' | 'energy_sustainability' | 'procurement';
 export type BuyerType = 'supply' | 'solutions' | 'both';
 export type DataConfidence = 'high' | 'medium' | 'low';
+export type HealthFlag = 'green' | 'amber' | 'red' | 'neutral';
+
+export interface FinancialHealthItem {
+  label: string;
+  value: string;
+  flag: HealthFlag;
+  detail: string;
+}
+
+export interface FinancialHealthCheck {
+  overallFlag: 'green' | 'amber' | 'red';
+  headline: string;
+  items: FinancialHealthItem[];
+  disclaimer: string;
+}
 
 export interface EnergyProject {
   title: string;
@@ -60,6 +75,7 @@ export interface ResearchReport {
   };
   keyPeople: Person[];
   energyDecisionStructure?: string;
+  financialHealth?: FinancialHealthCheck;
   recentNews?: NewsItem[];
   researchNotes?: string;
   generatedAt: string;
